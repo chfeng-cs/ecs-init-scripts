@@ -20,7 +20,6 @@ init_ssh() {
 		chmod 600 authorized_keys
 	fi
     guarantee_pk ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDBf5jaDI4zVycmTJNzBbV46xwyudolNQYpxYkdRkURvDIX3NGzzM34kjWX6gKjze7p75tCyQpHL/mIZMyp05jD7QiAzgmx8OGdz7eKKSx2W5msdqxT+7rnTtGZSLlLeOs4hJqT5FGx+0BvIla+JlhiWzbl1hAp1gXyFcvFd8jEX6V3Ry1fZGJ5dcWrh3ZOwHts6a5aRHXKMhvO+Jtt6DY2CyCiLzJprtQ65mLs1l7O0geLRINDgjoZUzLA+uPjvEn2Ka9CT+URPV6Dzohh1WZUFn+l0H9rBto9ZfIkuGO+kG/wZ3h12dhXz6YeKK4SaPBkCkCOF/l4lGwC0iGT7EB dande@fch-pc # My PC public key
-    guarantee_pk ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZrWxOBZ+u91Dt/anhBFt+jm1UN1918WpLY0s6HPkbDCZ+oDlfUJyGbvakycwweuznY9HvFQVOm17tdZVLdd60wtgEpcUI/3LOstyWNt+EXirIbkvIir/Pn+eC1erJFJj3NBX47m4cUFe34DtDUYg8/+whPxugpQm1PswPuzGISuOnM4Hss5e5QgfetvQ/Es8Ybo8l8rccNekFXUIn0tAASRotSmtMWyeteJPVGbse8GU0Xh+ekAHj3mzW1PXv63F2REDOpSZ1oMEjsb/aXjpY9DO4bg8EZBqH//8WZvWk/NZ090Yp4wqjrjGqFgekYxc961g+njR/ACVOPxxBMNEb chuanheng@ddst-PowerEdge-R8201  # Springboard public key
     cd ~
 }
 
