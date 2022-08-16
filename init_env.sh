@@ -1,5 +1,26 @@
 #!/bin/bash
 
+EMAIL=fengchuanheng@sjtu.edu.cn
+FULL_NAME=fengchuanheng
+
+intsall_sw() {
+    SW_LIST="build-essential curl git vim wget zsh"
+    sudo apt update
+    sudo apt -y install aptitude
+    sudo aptitude -y install $SW_LIST
+}
+
+init_zsh() {
+    cd ~
+    AUTO_SUG_DIR=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    if [ -f $AUTO_SUG_DIR ];then
+        git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
+    fi
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc -O ~/.zshrc
+
+}
+
 guarantee_pk() {
     if [ $# != 3 ]; then return; fi;
 	echo guarantee $3
@@ -45,13 +66,13 @@ init_bash() {
     else
         echo ".bashrc is existing. Overwriting ......"
     fi
-    wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.bashrc -O .bashrc
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.bashrc -O .bashrc
     if [ ! -f .profile ]; then
         echo "Creating .profile"
     else
         echo ".profile is existing. Overwriting ......"
     fi
-    wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.profile -O .profile
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.profile -O .profile
     # if [ ! -f .bashrc ]; then
     #     wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.bashrc
     # fi
@@ -63,14 +84,20 @@ init_bash() {
 # git
 init_git() {
     if [ `which git` ]; then
-        git config --global user.name "chfeng"
-        git config --global user.email "fengchuanheng@sjtu.edu.cn"
+        git config --global user.name $FULL_NAME
+        git config --global user.email $EMAIL
+        git config --global alias.co checkout
+        git config --global alias.br branch
+        git config --global alias.ci commit
+        git config --global alias.st status
     else
         echo "git is not installed on you system."
     fi
 }
 
 main() {
+    intsall_sw
+    init_zsh
     init_ssh
     init_vim
     init_bash
