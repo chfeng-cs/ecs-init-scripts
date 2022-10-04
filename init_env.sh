@@ -12,11 +12,16 @@ intsall_sw() {
 
 init_zsh() {
     cd ~
+    # install zsh via gitee instead of github
+    git clone https://gitee.com/whisky-root/ohmyzsh.git
+    zsh ohmyzsh/tools/install.sh
+
+    # plugins
     AUTO_SUG_DIR=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    if [ -f $AUTO_SUG_DIR ];then
-        git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
+    if [ ! -f $AUTO_SUG_DIR ];then
+        mkdir $AUTO_SUG_DIR
     fi
+    git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
     wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc -O ~/.zshrc
 
 }
@@ -97,11 +102,11 @@ init_git() {
 
 main() {
     intsall_sw
-    init_zsh
     init_ssh
-    init_vim
     init_bash
     init_git
+    init_vim
+    init_zsh
 }
 
 main
