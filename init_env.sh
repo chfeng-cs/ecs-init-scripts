@@ -53,7 +53,7 @@ init_ssh() {
 init_vim() {
     cd ~
     if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
-        git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+        git clone https://gitee.com/mirrors/Vundle.git ~/.vim/bundle/Vundle.vim
     fi
     if [ ! -f .vimrc ]; then
         echo "Creating .vimrc"
