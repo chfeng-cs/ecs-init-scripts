@@ -3,11 +3,27 @@
 EMAIL=fengchuanheng@sjtu.edu.cn
 FULL_NAME=fengchuanheng
 
+CMD=""
+if [[ $(command -v apt-get) ]]; then
+    CMD="apt-get"
+elif [[ $(command -v yum) ]]; then
+    CMD="yum"
+else
+    echo "Unsupported System:"
+    lsb_release -a
+fi
+
 intsall_sw() {
     SW_LIST="build-essential curl git vim wget zsh"
-    sudo apt update
-    sudo apt -y install aptitude
-    sudo aptitude -y install $SW_LIST
+    sudo $CMD update
+    if [[ $(command -v apt-get) ]]; then
+        # Ubuntu or Debian
+        sudo $CMD -y install aptitude
+        sudo aptitude -y install $SW_LIST
+    else
+        # CentOS
+        sudo $CMD -y install $SW_LIST
+    fi
 }
 
 init_zsh() {
