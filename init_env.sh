@@ -27,10 +27,14 @@ intsall_sw() {
 }
 
 init_zsh() {
+    INSTALL_SH=~/ohmyzsh/tools/install.sh
+
     cd ~
     # install zsh via gitee instead of github
     git clone https://gitee.com/whisky-root/ohmyzsh.git
-    zsh ohmyzsh/tools/install.sh
+    sed -i 's/github.com\/\${REPO}/gitee.com\/\${REPO}/' $INSTALL_SH
+    sed -i 's/REPO:-ohmyzsh\/ohmyzsh/REPO:-mirrors\/oh_my_zsh/' $INSTALL_SH
+    zsh $INSTALL_SH
 
     # plugins
     AUTO_SUG_DIR=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
@@ -39,7 +43,6 @@ init_zsh() {
     fi
     git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
     wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc -O ~/.zshrc
-
 }
 
 guarantee_pk() {
