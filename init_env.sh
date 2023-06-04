@@ -33,7 +33,7 @@ init_zsh() {
     # install zsh via gitee instead of github
     git clone https://gitee.com/whisky-root/ohmyzsh.git
     sed -i 's/github.com\/\${REPO}/gitee.com\/\${REPO}/' $INSTALL_SH
-    sed -i 's/REPO:-ohmyzsh\/ohmyzsh/REPO:-mirrors\/oh_my_zsh/' $INSTALL_SH
+    sed -i 's/REPO:-ohmyzsh\/ohmyzsh/REPO:-whisky-root\/ohmyzsh/' $INSTALL_SH
     zsh $INSTALL_SH
 
     # plugins
