@@ -114,6 +114,14 @@ init_git() {
         git config --global alias.br branch
         git config --global alias.ci commit
         git config --global alias.st status
+        git config --global alias.mg merge
+        git config --global alias.md commit --amend
+        git config --global alias.dt difftool
+        git config --global alias.mt mergetool
+        git config --global alias.cf config
+        git config --global alias.last log -1 HEAD
+        git config --global alias.line log --oneline
+        git config --global alias.latest for-each-ref --sort=-committerdate --format='%(committerdate:short) %(refname:short) [%(committername)]'
     else
         echo "git is not installed on you system."
     fi
