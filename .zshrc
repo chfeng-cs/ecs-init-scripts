@@ -9,10 +9,15 @@ export ZSH="$HOME/.oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 
-if [ $TERM_PROGRAM ];then
-    ZSH_THEME="random"
-else
+# if [ $TERM_PROGRAM ]; then
+#     ZSH_THEME="random"
+# else
+#     ZSH_THEME="agnoster"
+# fi
+if [[ "$ZSH_VERSION" < "5.1.0" ]]; then
     ZSH_THEME="agnoster"
+else
+    ZSH_THEME="powerlevel10k/powerlevel10k"
 fi
 
 # Set list of themes to pick from when loading at random
@@ -107,3 +112,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+P10K_CONF=~/.p10k-vscode.zsh
+[[ ! -f $P10K_CONF ]] || source $P10K_CONF

@@ -29,6 +29,11 @@ intsall_sw() {
 init_zsh() {
     INSTALL_SH=~/ohmyzsh/tools/install.sh
 
+    # check if zsh is installed
+    if [ ! `which zsh` ]; then
+        sudo $CMD -y install zsh
+    fi
+
     cd ~
     # install zsh via gitee instead of github
     git clone https://gitee.com/whisky-root/ohmyzsh.git
@@ -43,6 +48,15 @@ init_zsh() {
     fi
     git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
     wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc -O ~/.zshrc
+
+    # powerlevel10k theme
+    POWER_LEVEL_10K_DIR=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+    if [ ! -d $POWER_LEVEL_10K_DIR ];then
+        git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git $POWER_LEVEL_10K_DIR
+    fi
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh -O ~/.p10k.zsh
+
 }
 
 guarantee_pk() {
@@ -119,9 +133,9 @@ init_git() {
         git config --global alias.dt difftool
         git config --global alias.mt mergetool
         git config --global alias.cf config
-        git config --global alias.last log -1 HEAD
-        git config --global alias.line log --oneline
-        git config --global alias.latest for-each-ref --sort=-committerdate --format='%(committerdate:short) %(refname:short) [%(committername)]'
+        git config --global alias.last log -1 HEAD 2>/dev/null
+        git config --global alias.line log --oneline 2>/dev/null
+        git config --global alias.latest for-each-ref --sort=-committerdate --format='%(committerdate:short) %(refname:short) [%(committername)]' 2>/dev/null
     else
         echo "git is not installed on you system."
     fi
