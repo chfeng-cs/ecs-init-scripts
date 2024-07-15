@@ -79,6 +79,8 @@ init_ssh() {
 		chmod 600 authorized_keys
 	fi
     guarantee_pk ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDBf5jaDI4zVycmTJNzBbV46xwyudolNQYpxYkdRkURvDIX3NGzzM34kjWX6gKjze7p75tCyQpHL/mIZMyp05jD7QiAzgmx8OGdz7eKKSx2W5msdqxT+7rnTtGZSLlLeOs4hJqT5FGx+0BvIla+JlhiWzbl1hAp1gXyFcvFd8jEX6V3Ry1fZGJ5dcWrh3ZOwHts6a5aRHXKMhvO+Jtt6DY2CyCiLzJprtQ65mLs1l7O0geLRINDgjoZUzLA+uPjvEn2Ka9CT+URPV6Dzohh1WZUFn+l0H9rBto9ZfIkuGO+kG/wZ3h12dhXz6YeKK4SaPBkCkCOF/l4lGwC0iGT7EB dande@fch-pc # My PC public key
+    guarantee_pk ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC/FDGrk167CNnOxTu+IB2zelSBjaHntL5pa9nhd/JVsqURcRH64dWvxsDbDUrdp3g/uoRqBDorCuZiNeL/JOhqpkw7K/Mm9J6TC+VybhiiMXG/0ca482ek6vY1xXvfmwjo/jyMTlHUNIohFbyrI4DOK968hM2bWsl0rV5hAkmjSXRaSLwjUbOWYbuZYeYeS6UX5JcQlWE4E02hit8VGtyW+ArIbcHBoFnoERAPh7LwfgQKqBmU3DKCewgJJ98F6GRhHHcUZtSCYBj1TCKPgJ304lPlfnwVvwAkiUbHn8k/7XRq+GFU4zMOw1YNh/rn28AZM+HNHCa8/uLugBLqADh+915vrjqvo+6OMHrDmpXyAoixZYpq7lgTjc1Sbuv/oSO/kiuU89uJpm95EiS84Xg9+j2zj4SS8b+DEe06/QTaz76BhkygWLQJqtJAV+3BJU4IgijKuna4aXh23OIwT/VQ8EBm7e7oP3c49lk5+uR1jFzLYC39lpC1pWaYc8odPbM= feng@DESKTOP-4BCF5JK # Add work pk
+
     cd ~
 }
 
