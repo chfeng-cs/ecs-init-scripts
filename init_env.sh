@@ -54,8 +54,8 @@ init_zsh() {
     if [ ! -d $POWER_LEVEL_10K_DIR ];then
         git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git $POWER_LEVEL_10K_DIR
     fi
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh -O ~/.p10k.zsh
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh && [ ! -s ~/.p10k-vscode.zsh ] && wget -q https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh
+    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh -O ~/.p10k.zsh && [ ! -s ~/.p10k.zsh ] && wget -q https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k.zsh -O ~/.p10k.zsh
 
 }
 
