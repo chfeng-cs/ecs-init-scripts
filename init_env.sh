@@ -54,8 +54,29 @@ init_zsh() {
     if [ ! -d $POWER_LEVEL_10K_DIR ];then
         git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git $POWER_LEVEL_10K_DIR
     fi
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh && [ ! -s ~/.p10k-vscode.zsh ] && wget -q https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k-vscode.zsh -O ~/.p10k-vscode.zsh
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh -O ~/.p10k.zsh && [ ! -s ~/.p10k.zsh ] && wget -q https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k.zsh -O ~/.p10k.zsh
+    download_with_fallback() {
+        local primary_url="$1"
+        local fallback_url="$2"
+        local target_file="$3"
+
+        wget -q "$primary_url" -O "$target_file" || true
+        if [ ! -s "$target_file" ]; then
+            wget -q "$fallback_url" -O "$target_file"
+        fi
+        if [ ! -s "$target_file" ]; then
+            echo "Failed to download $target_file"
+            return 1
+        fi
+    }
+
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh \
+        https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k-vscode.zsh \
+        ~/.p10k-vscode.zsh
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh \
+        https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k.zsh \
+        ~/.p10k.zsh
 
 }
 
