@@ -4,22 +4,37 @@ EMAIL=fengchuanheng@sjtu.edu.cn
 FULL_NAME=fengchuanheng
 
 CMD=""
-if [[ $(command -v apt-get) ]]; then
+if command -v nala >/dev/null 2>&1; then
+    CMD="nala"
+elif command -v apt-get >/dev/null 2>&1; then
     CMD="apt-get"
-elif [[ $(command -v yum) ]]; then
+elif command -v yum >/dev/null 2>&1; then
     CMD="yum"
 else
     echo "Unsupported System:"
     lsb_release -a
 fi
 
+ensure_nala() {
+    if [[ "$CMD" == "apt-get" ]] && ! command -v nala >/dev/null 2>&1; then
+        sudo apt-get update
+        sudo apt-get install -y nala
+        if command -v nala >/dev/null 2>&1; then
+            CMD="nala"
+        fi
+    fi
+}
+
 intsall_sw() {
     SW_LIST="build-essential curl git vim wget zsh"
+    ensure_nala
     sudo $CMD update
-    if [[ $(command -v apt-get) ]]; then
+    if [[ "$CMD" == "nala" ]]; then
         # Ubuntu or Debian
-        sudo $CMD -y install aptitude
-        sudo aptitude -y install $SW_LIST
+        sudo $CMD install -y $SW_LIST
+    elif [[ "$CMD" == "apt-get" ]]; then
+        # Ubuntu or Debian
+        sudo $CMD -y install $SW_LIST
     else
         # CentOS
         sudo $CMD -y install $SW_LIST
@@ -39,7 +54,11 @@ init_zsh() {
     git clone https://gitee.com/whisky-root/ohmyzsh.git
     sed -i 's/github.com\/\${REPO}/gitee.com\/\${REPO}/' $INSTALL_SH
     sed -i 's/REPO:-ohmyzsh\/ohmyzsh/REPO:-whisky-root\/ohmyzsh/' $INSTALL_SH
-    zsh $INSTALL_SH
+    sh "$INSTALL_SH" --unattended
+    TARGET_USER=${SUDO_USER:-${USER}}
+    if [ "$TARGET_USER" != "root" ]; then
+        sudo chsh -s "$(command -v zsh)" "$TARGET_USER"
+    fi
 
     # plugins
     AUTO_SUG_DIR=${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
