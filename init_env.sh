@@ -1,7 +1,7 @@
 #!/bin/bash
 
-EMAIL=fengchuanheng@sjtu.edu.cn
-FULL_NAME=fengchuanheng
+EMAIL=ethan.fengch@gmail.com
+FULL_NAME=Ethan Feng
 
 CMD=""
 if command -v nala >/dev/null 2>&1; then
