@@ -15,6 +15,22 @@ else
     lsb_release -a
 fi
 
+bootstrap_sync() {
+    local SYNC_DIR="$HOME/.local/bin"
+    local SYNC_SCRIPT="$SYNC_DIR/sync-dotfiles"
+    mkdir -p "$SYNC_DIR"
+    wget -q "https://gitee.com/chfeng-cs/ecs-init-scripts/raw/master/sync-dotfiles.sh" -O "$SYNC_SCRIPT" || true
+    if [ ! -s "$SYNC_SCRIPT" ]; then
+        wget -q "https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/sync-dotfiles.sh" -O "$SYNC_SCRIPT"
+    fi
+    if [ ! -s "$SYNC_SCRIPT" ]; then
+        echo "Failed to download sync-dotfiles"
+        exit 1
+    fi
+    chmod +x "$SYNC_SCRIPT"
+    source "$SYNC_SCRIPT"
+}
+
 ensure_nala() {
     if [[ "$CMD" == "apt-get" ]] && ! command -v nala >/dev/null 2>&1; then
         sudo apt-get update
@@ -66,28 +82,12 @@ init_zsh() {
         mkdir $AUTO_SUG_DIR
     fi
     git clone https://gitee.com/keman5/zsh-autosuggestions.git $AUTO_SUG_DIR
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc -O ~/.zshrc
 
     # powerlevel10k theme
     POWER_LEVEL_10K_DIR=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
     if [ ! -d $POWER_LEVEL_10K_DIR ];then
         git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git $POWER_LEVEL_10K_DIR
     fi
-    download_with_fallback() {
-        local primary_url="$1"
-        local fallback_url="$2"
-        local target_file="$3"
-
-        wget -q "$primary_url" -O "$target_file" || true
-        if [ ! -s "$target_file" ]; then
-            wget -q "$fallback_url" -O "$target_file"
-        fi
-        if [ ! -s "$target_file" ]; then
-            echo "Failed to download $target_file"
-            return 1
-        fi
-    }
-
     download_with_fallback \
         https://gitee.com/chfeng-cs/scripts/raw/master/.p10k-vscode.zsh \
         https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k-vscode.zsh \
@@ -130,35 +130,23 @@ init_vim() {
     if [ ! -d ~/.vim/bundle/Vundle.vim ]; then
         git clone https://gitee.com/mirrors/Vundle.git ~/.vim/bundle/Vundle.vim
     fi
-    if [ ! -f .vimrc ]; then
-        echo "Creating .vimrc"
-        wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.vimrc -O .vimrc
-    else
-        echo ".vimrc is existing. Do nothing ......"
-    fi
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/simple-scripts/raw/master/.vimrc \
+        https://raw.githubusercontent.com/chfeng-cs/simple-scripts/master/.vimrc \
+        ~/.vimrc
 }
 
 # bash
 init_bash() {
     cd ~
-    if [ ! -f .bashrc ]; then
-        echo "Creating .bashrc"
-    else
-        echo ".bashrc is existing. Overwriting ......"
-    fi
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.bashrc -O .bashrc
-    if [ ! -f .profile ]; then
-        echo "Creating .profile"
-    else
-        echo ".profile is existing. Overwriting ......"
-    fi
-    wget -q https://gitee.com/chfeng-cs/scripts/raw/master/.profile -O .profile
-    # if [ ! -f .bashrc ]; then
-    #     wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.bashrc
-    # fi
-    # if [ ! -f .profile ]; then
-    #     wget -q https://gitee.com/chfeng-cs/simple-scripts/raw/master/.profile
-    # fi
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/scripts/raw/master/.bashrc \
+        https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.bashrc \
+        ~/.bashrc
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/scripts/raw/master/.profile \
+        https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.profile \
+        ~/.profile
 }
 
 # git
@@ -184,6 +172,7 @@ init_git() {
 }
 
 main() {
+    bootstrap_sync
     intsall_sw
     init_ssh
     init_bash

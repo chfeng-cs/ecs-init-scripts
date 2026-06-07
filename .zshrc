@@ -87,6 +87,20 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+set_proxy() {
+    export https_proxy=http://127.0.0.1:7890
+    export http_proxy=http://127.0.0.1:7890
+    export all_proxy=socks5://127.0.0.1:7890
+    print -P "%K{22}%F{46}  PROXY %k%f%F{22}%f %F{cyan}http://127.0.0.1:7890%f  %F{245}· unset_proxy to disable%f"
+}
+
+alias unset_proxy='unset https_proxy http_proxy all_proxy && print -P "%F{245} PROXY%f %F{red}off%f"'
+
+# auto-detect and set proxy
+if curl -s --max-time 1 http://127.0.0.1:7890 > /dev/null 2>&1 || [ $? -eq 56 ]; then
+    set_proxy
+fi
+
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
