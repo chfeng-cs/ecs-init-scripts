@@ -97,7 +97,7 @@ set_proxy() {
 alias unset_proxy='unset https_proxy http_proxy all_proxy && print -P "%F{245} PROXY%f %F{red}off%f"'
 
 # auto-detect and set proxy
-if curl -s --max-time 1 http://127.0.0.1:7890 > /dev/null 2>&1 || [ $? -eq 56 ]; then
+if pgrep -x mihomo > /dev/null 2>&1; then
     set_proxy
 fi
 
