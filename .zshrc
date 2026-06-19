@@ -102,12 +102,12 @@ set_proxy() {
     export https_proxy="$http_proxy"
     export all_proxy="socks5://${proxy_host}:${proxy_port}"
     export HTTP_PROXY="$http_proxy" HTTPS_PROXY="$https_proxy" ALL_PROXY="$all_proxy"
-    print -P "%K{22}%F{46}  PROXY %k%f%F{22}%f %F{cyan}${proxy_host}:${proxy_port}%f  %F{245}· unset_proxy to disable%f"
+    print -P "%F{39}●%f %F{252}proxy%f %F{240}→%f %F{248}${proxy_host}%f%F{240}:%f%F{244}${proxy_port}%f"
 }
 
 unset_proxy() {
     unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
-    print -P "%F{245} PROXY%f %F{red}off%f"
+    print -P "%F{240}○%f %F{244}proxy%f %F{240}off%f"
 }
 
 # auto-enable
