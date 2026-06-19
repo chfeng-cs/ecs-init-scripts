@@ -87,17 +87,35 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# ── proxy config ──────────────────────────────────────────
+proxy_port=7897
+
+# WSL: use Windows host (default gateway); native Linux: localhost
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    proxy_host=$(ip route | awk '/^default/ {print $3; exit}')
+else
+    proxy_host=127.0.0.1
+fi
+
 set_proxy() {
-    export https_proxy=http://127.0.0.1:7890
-    export http_proxy=http://127.0.0.1:7890
-    export all_proxy=socks5://127.0.0.1:7890
-    print -P "%K{22}%F{46}  PROXY %k%f%F{22}%f %F{cyan}http://127.0.0.1:7890%f  %F{245}· unset_proxy to disable%f"
+    export http_proxy="http://${proxy_host}:${proxy_port}"
+    export https_proxy="$http_proxy"
+    export all_proxy="socks5://${proxy_host}:${proxy_port}"
+    export HTTP_PROXY="$http_proxy" HTTPS_PROXY="$https_proxy" ALL_PROXY="$all_proxy"
+    print -P "%K{22}%F{46}  PROXY %k%f%F{22}%f %F{cyan}${proxy_host}:${proxy_port}%f  %F{245}· unset_proxy to disable%f"
 }
 
-alias unset_proxy='unset https_proxy http_proxy all_proxy && print -P "%F{245} PROXY%f %F{red}off%f"'
+unset_proxy() {
+    unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+    print -P "%F{245} PROXY%f %F{red}off%f"
+}
 
-# auto-detect and set proxy
-if pgrep -x mihomo > /dev/null 2>&1; then
+# auto-enable
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    # WSL: mihomo runs on Windows side, can't pgrep it — enable directly
+    set_proxy
+elif pgrep -x mihomo > /dev/null 2>&1; then
+    # native Linux: enable only if local mihomo is running
     set_proxy
 fi
 
