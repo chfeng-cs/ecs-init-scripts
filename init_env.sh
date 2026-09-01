@@ -8,7 +8,9 @@ MIN_GIT_VERSION="2.20.0"
 
 MIHOMO_VERSION="v1.19.30"
 MIHOMO_ARCHIVE="mihomo-linux-amd64-v1-go120-${MIHOMO_VERSION}.gz"
+MIHOMO_MD5="25f60e0d0b91d0e414806a269a7e3800"
 MIHOMO_DIR="$HOME/.bin/mihomo"
+MIHOMO_CACHE_DIR="$HOME/.cache/ecs-init-scripts"
 MIHOMO_RELEASE_URL="https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/${MIHOMO_ARCHIVE}"
 MIHOMO_GITEE_URL="https://gitee.com/chfeng-cs/scripts/raw/master/${MIHOMO_ARCHIVE}"
 MIHOMO_GITHUB_URL="https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/${MIHOMO_ARCHIVE}"
@@ -302,27 +304,37 @@ init_git() {
     fi
 }
 
-download_from_sources() {
-    local target_file="$1"
-    shift
+download_mihomo() {
+    local archive_file="$1"
     local url
+    local actual_md5
 
-    for url in "$@"; do
-        echo "==> downloading $(basename "$target_file") from $url"
-        if curl -fL --progress-bar --connect-timeout 10 --speed-limit 1 --speed-time 10 \
-            --output "$target_file" "$url"; then
+    if [ -s "$archive_file" ]; then
+        actual_md5=$(md5sum "$archive_file" | awk '{print $1}')
+        if [ "$actual_md5" = "$MIHOMO_MD5" ]; then
+            echo "[SKIP] using cached $MIHOMO_ARCHIVE"
             return 0
         fi
-        echo "  download failed, trying the next source"
+        rm -f "$archive_file"
+    fi
+
+    for url in "$MIHOMO_GITHUB_URL" "$MIHOMO_RELEASE_URL" "$MIHOMO_GITEE_URL"; do
+        echo "==> downloading $MIHOMO_ARCHIVE from $url"
+        if curl -fL --progress-bar --connect-timeout 10 --speed-limit 1 --speed-time 10 \
+            --output "$archive_file" "$url"; then
+            actual_md5=$(md5sum "$archive_file" | awk '{print $1}')
+            if [ "$actual_md5" = "$MIHOMO_MD5" ]; then
+                return 0
+            fi
+            echo "  MD5 mismatch, trying the next source"
+        else
+            echo "  download failed, trying the next source"
+        fi
+        rm -f "$archive_file"
     done
 
-    rm -f "$target_file"
+    rm -f "$archive_file"
     return 1
-}
-
-download_mihomo() {
-    download_from_sources "$1" \
-        "$MIHOMO_GITHUB_URL" "$MIHOMO_RELEASE_URL" "$MIHOMO_GITEE_URL"
 }
 
 write_start_mihomo() {
@@ -425,7 +437,7 @@ download_clash_config() {
 
 install_mihomo() {
     local answer
-    local archive_file="$MIHOMO_DIR/mihomo.gz"
+    local archive_file="$MIHOMO_CACHE_DIR/$MIHOMO_ARCHIVE"
     local version_file="$MIHOMO_DIR/.version"
 
     if [ -x "$MIHOMO_DIR/mihomo" ] && [ "$(cat "$version_file" 2>/dev/null)" = "$MIHOMO_VERSION" ]; then
@@ -445,13 +457,14 @@ install_mihomo() {
                 ;;
         esac
 
-        mkdir -p "$MIHOMO_DIR"
+        mkdir -p "$MIHOMO_DIR" "$MIHOMO_CACHE_DIR"
         if ! download_mihomo "$archive_file"; then
             echo "Failed to download mihomo from all sources."
             return 1
         fi
 
-        if ! gzip -df "$archive_file"; then
+        if ! gzip -dc "$archive_file" > "$MIHOMO_DIR/mihomo"; then
+            rm -f "$MIHOMO_DIR/mihomo"
             echo "Failed to extract mihomo."
             return 1
         fi

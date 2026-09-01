@@ -32,6 +32,7 @@ bash init_env.sh
 - Some downloads prefer Gitee to reduce latency in mainland China.
 - If a Gitee download returns a zero-byte file, the script retries from GitHub.
 - The optional mihomo setup installs `start_mihomo` under `~/.bin/mihomo`.
+- The mihomo archive is MD5-verified and cached under `~/.cache/ecs-init-scripts`.
 - GEOIP/GEOSITE rules are removed so mihomo does not require GEO databases.
 
 ## Files
