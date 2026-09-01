@@ -3,6 +3,13 @@
 EMAIL="ethan.fengch@gmail.com"
 FULL_NAME="Ethan Feng"
 
+MIHOMO_VERSION="v1.19.30"
+MIHOMO_ARCHIVE="mihomo-linux-amd64-v1-go120-${MIHOMO_VERSION}.gz"
+MIHOMO_DIR="$HOME/.bin/mihomo"
+MIHOMO_RELEASE_URL="https://github.com/MetaCubeX/mihomo/releases/download/${MIHOMO_VERSION}/${MIHOMO_ARCHIVE}"
+MIHOMO_GITEE_URL="https://gitee.com/chfeng-cs/scripts/raw/master/${MIHOMO_ARCHIVE}"
+MIHOMO_GITHUB_URL="https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/${MIHOMO_ARCHIVE}"
+
 CMD=""
 if command -v nala >/dev/null 2>&1; then
     CMD="nala"
@@ -104,12 +111,21 @@ init_zsh() {
 }
 
 guarantee_pk() {
-    if [ $# != 3 ]; then return; fi;
-	echo guarantee $3
-	if [ `cat authorized_keys | grep $2 | wc -l` == 0 ]; then
-		echo $* >> authorized_keys
-		echo $3 added
-	fi;
+    if [ "$#" -ne 3 ]; then
+        return 1
+    fi
+
+    local key_type="$1"
+    local public_key="$2"
+    local comment="$3"
+
+    if awk -v key="$public_key" '$2 == key { found = 1; exit } END { exit !found }' authorized_keys; then
+        echo "$comment already exists"
+        return 0
+    fi
+
+    printf '%s %s %s\n' "$key_type" "$public_key" "$comment" >> authorized_keys
+    echo "$comment added"
 }
 
 init_ssh() {
@@ -175,6 +191,129 @@ init_git() {
     fi
 }
 
+download_mihomo() {
+    local archive_file="$1"
+    local url
+
+    for url in "$MIHOMO_RELEASE_URL" "$MIHOMO_GITEE_URL" "$MIHOMO_GITHUB_URL"; do
+        echo "==> downloading mihomo from $url"
+        if curl -fL --progress-bar --connect-timeout 10 --speed-limit 1 --speed-time 10 \
+            --output "$archive_file" "$url"; then
+            return 0
+        fi
+        echo "  download failed, trying the next source"
+    done
+
+    rm -f "$archive_file"
+    return 1
+}
+
+write_start_mihomo() {
+    cat > "$MIHOMO_DIR/start_mihomo" <<'EOF'
+#!/bin/bash
+
+MIHOMO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+MIHOMO_BIN="$MIHOMO_DIR/mihomo"
+MIHOMO_CONFIG="$MIHOMO_DIR/clash.yaml"
+MIHOMO_LOG="$MIHOMO_DIR/mihomo.log"
+
+if [ ! -x "$MIHOMO_BIN" ]; then
+    echo "mihomo executable not found: $MIHOMO_BIN"
+    exit 1
+fi
+if [ ! -s "$MIHOMO_CONFIG" ]; then
+    echo "mihomo config not found: $MIHOMO_CONFIG"
+    exit 1
+fi
+if pgrep -x mihomo >/dev/null 2>&1; then
+    echo "mihomo is already running"
+    exit 0
+fi
+
+nohup "$MIHOMO_BIN" -d "$MIHOMO_DIR" -f "$MIHOMO_CONFIG" \
+    > "$MIHOMO_LOG" 2>&1 &
+echo "mihomo started (PID $!), log: $MIHOMO_LOG"
+EOF
+
+    chmod +x "$MIHOMO_DIR/start_mihomo"
+}
+
+add_mihomo_to_path() {
+    local path_line='export PATH="$HOME/.bin/mihomo:$PATH"'
+
+    if ! grep -Fqx "$path_line" "$HOME/.zshrc" 2>/dev/null; then
+        {
+            echo
+            echo '# mihomo commands'
+            echo "$path_line"
+        } >> "$HOME/.zshrc"
+    fi
+}
+
+download_clash_config() {
+    local subscription_url
+    local mixed_port
+
+    read -r -p "Clash subscription URL (press Enter to skip): " subscription_url
+    if [ -z "$subscription_url" ]; then
+        echo "Skipped Clash config download. Add it later as $MIHOMO_DIR/clash.yaml"
+        return 0
+    fi
+
+    if ! curl -fsSL --connect-timeout 15 --speed-limit 1 --speed-time 15 \
+        --user-agent mihomo --output "$MIHOMO_DIR/clash.yaml" "$subscription_url"; then
+        rm -f "$MIHOMO_DIR/clash.yaml"
+        echo "Failed to download Clash config. The mihomo installation is still available."
+        return 1
+    fi
+
+    chmod 600 "$MIHOMO_DIR/clash.yaml"
+    echo "Clash config saved to $MIHOMO_DIR/clash.yaml"
+
+    mixed_port=$(awk '/^[[:space:]]*mixed-port:[[:space:]]*[0-9]+/ {print $2; exit}' \
+        "$MIHOMO_DIR/clash.yaml")
+    if [ -n "$mixed_port" ] && [ "$mixed_port" != "7897" ]; then
+        echo "Note: config mixed-port is $mixed_port, but ~/.zshrc currently uses proxy port 7897."
+    fi
+}
+
+install_mihomo() {
+    local answer
+    local archive_file="$MIHOMO_DIR/mihomo.gz"
+
+    read -r -p "Install mihomo ${MIHOMO_VERSION}? [y/N] " answer
+    if [[ ! "$answer" =~ ^[Yy]$ ]]; then
+        echo "Skipping mihomo installation."
+        return 0
+    fi
+
+    case "$(uname -m)" in
+        x86_64|amd64) ;;
+        *)
+            echo "Unsupported architecture: $(uname -m). This package is for amd64 only."
+            return 1
+            ;;
+    esac
+
+    mkdir -p "$MIHOMO_DIR"
+    if ! download_mihomo "$archive_file"; then
+        echo "Failed to download mihomo from all sources."
+        return 1
+    fi
+
+    if ! gzip -df "$archive_file"; then
+        echo "Failed to extract mihomo."
+        return 1
+    fi
+    chmod +x "$MIHOMO_DIR/mihomo"
+
+    write_start_mihomo
+    add_mihomo_to_path
+    echo "mihomo installed in $MIHOMO_DIR"
+    download_clash_config || true
+    echo "Run 'source ~/.zshrc', then use start_mihomo."
+}
+
 main() {
     bootstrap_sync
     intsall_sw
@@ -183,6 +322,7 @@ main() {
     init_git
     init_vim
     init_zsh
+    install_mihomo
 }
 
 main

@@ -7,6 +7,7 @@ Minimal bootstrap scripts for a fresh Linux server.
 - Installs common tooling for Ubuntu/Debian and CentOS
 - Sets up `zsh` with `oh-my-zsh`
 - Configures `vim`, `bash`, `git`, and `ssh`
+- Optionally installs mihomo with Clash subscription support
 - Uses Gitee mirrors where possible, with GitHub fallback for broken downloads
 
 ## Highlights
@@ -29,9 +30,9 @@ bash init_env.sh
 - The script assumes `sudo` access.
 - Some downloads prefer Gitee to reduce latency in mainland China.
 - If a Gitee download returns a zero-byte file, the script retries from GitHub.
+- The optional mihomo setup installs `start_mihomo` under `~/.bin/mihomo`.
 
 ## Files
 
 - `init_env.sh` - main bootstrap script
 - `README.md` - project overview
-
