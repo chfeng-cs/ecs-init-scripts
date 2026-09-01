@@ -4,7 +4,7 @@ Minimal bootstrap scripts for a fresh Linux server.
 
 ## What It Does
 
-- Installs common tooling for Ubuntu/Debian and CentOS
+- Installs common tooling for Debian/Ubuntu and common RHEL/Fedora systems
 - Sets up `zsh` with `oh-my-zsh`
 - Configures `vim`, `bash`, `git`, and `ssh`
 - Optionally installs mihomo with Clash subscription support
@@ -28,9 +28,11 @@ bash init_env.sh
 ## Notes
 
 - The script assumes `sudo` access.
+- Git 2.20.0+ and Zsh 5.1.0+ are required.
 - Some downloads prefer Gitee to reduce latency in mainland China.
 - If a Gitee download returns a zero-byte file, the script retries from GitHub.
 - The optional mihomo setup installs `start_mihomo` under `~/.bin/mihomo`.
+- Newly downloaded Clash configs use DAT geodata mode instead of MMDB.
 
 ## Files
 
