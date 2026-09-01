@@ -32,7 +32,7 @@ bash init_env.sh
 - Some downloads prefer Gitee to reduce latency in mainland China.
 - If a Gitee download returns a zero-byte file, the script retries from GitHub.
 - The optional mihomo setup installs `start_mihomo` under `~/.bin/mihomo`.
-- Newly downloaded Clash configs use DAT geodata mode instead of MMDB.
+- GEOIP/GEOSITE rules are removed so mihomo does not require GEO databases.
 
 ## Files
 

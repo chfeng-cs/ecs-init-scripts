@@ -302,21 +302,27 @@ init_git() {
     fi
 }
 
-download_mihomo() {
-    local archive_file="$1"
+download_from_sources() {
+    local target_file="$1"
+    shift
     local url
 
-    for url in "$MIHOMO_GITHUB_URL" "$MIHOMO_RELEASE_URL" "$MIHOMO_GITEE_URL"; do
-        echo "==> downloading mihomo from $url"
+    for url in "$@"; do
+        echo "==> downloading $(basename "$target_file") from $url"
         if curl -fL --progress-bar --connect-timeout 10 --speed-limit 1 --speed-time 10 \
-            --output "$archive_file" "$url"; then
+            --output "$target_file" "$url"; then
             return 0
         fi
         echo "  download failed, trying the next source"
     done
 
-    rm -f "$archive_file"
+    rm -f "$target_file"
     return 1
+}
+
+download_mihomo() {
+    download_from_sources "$1" \
+        "$MIHOMO_GITHUB_URL" "$MIHOMO_RELEASE_URL" "$MIHOMO_GITEE_URL"
 }
 
 write_start_mihomo() {
@@ -364,6 +370,7 @@ add_mihomo_to_path() {
 download_clash_config() {
     local subscription_url
     local config_tmp="$MIHOMO_DIR/.clash.yaml.new"
+    local sanitized_tmp="$MIHOMO_DIR/.clash.yaml.sanitized"
     local mixed_port
 
     read -r -p "Clash subscription URL (press Enter to keep current config): " subscription_url
@@ -384,10 +391,26 @@ download_clash_config() {
         return 1
     fi
 
-    if grep -q '^geodata-mode:' "$config_tmp"; then
-        sed -i 's/^geodata-mode:.*/geodata-mode: true/' "$config_tmp"
+    sed -i \
+        -e '/^[[:space:]]*-[[:space:]].*GEOIP,/d' \
+        -e '/^[[:space:]]*-[[:space:]].*GEOSITE,/d' \
+        -e '/^[[:space:]]*-[[:space:]]*[Gg][Ee][Oo][Ss][Ii][Tt][Ee]:/d' \
+        -e 's/^\([[:space:]]*geoip:[[:space:]]*\)true[[:space:]]*$/\1false/' \
+        "$config_tmp"
+    awk '
+        /^[[:space:]]+geosite:/ {
+            skip_indent = match($0, /[^ ]/) - 1
+            next
+        }
+        skip_indent && /^[[:space:]]*$/ { next }
+        skip_indent && match($0, /[^ ]/) - 1 > skip_indent { next }
+        { skip_indent = 0; print }
+    ' "$config_tmp" > "$sanitized_tmp"
+    mv "$sanitized_tmp" "$config_tmp"
+    if grep -q '^geo-auto-update:' "$config_tmp"; then
+        sed -i 's/^geo-auto-update:.*/geo-auto-update: false/' "$config_tmp"
     else
-        sed -i '1i geodata-mode: true' "$config_tmp"
+        sed -i '1i geo-auto-update: false' "$config_tmp"
     fi
     chmod 600 "$config_tmp"
     mv "$config_tmp" "$MIHOMO_DIR/clash.yaml"
