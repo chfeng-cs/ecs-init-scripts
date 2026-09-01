@@ -1,7 +1,7 @@
 #!/bin/bash
 
-EMAIL=ethan.fengch@gmail.com
-FULL_NAME=Ethan Feng
+EMAIL="ethan.fengch@gmail.com"
+FULL_NAME="Ethan Feng"
 
 CMD=""
 if command -v nala >/dev/null 2>&1; then
@@ -96,6 +96,10 @@ init_zsh() {
         https://gitee.com/chfeng-cs/scripts/raw/master/.p10k.zsh \
         https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.p10k.zsh \
         ~/.p10k.zsh
+    download_with_fallback \
+        https://gitee.com/chfeng-cs/scripts/raw/master/.zshrc \
+        https://raw.githubusercontent.com/chfeng-cs/ecs-init-scripts/master/.zshrc \
+        ~/.zshrc
 
 }
 
